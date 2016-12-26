@@ -18,6 +18,7 @@ end
 
 
 %X_n^N(t)임시값
+%추후 수정하기, 현재 임시값.
 for n=1:N;
     XnN(n)=randi(N);
 end
@@ -44,9 +45,9 @@ MiNt(i) = (1/N) * sum(sum1);
 %P_iiNm= (p_i(m)/(m(i)*N)) * B0(b-i, i/b rho N) 1[i'=b]
 %        +1[i'=i-1][sigma j=1~b(p_(b-j)(m)*B1(j,i/b rho N))
 %            +p_i(m)(1-(1/(m(i)*N))) B1(b-i,i/b rho N)] + o(1/N);
-%i와 i' 변수 이름 수정하기
+%i와 i_ 변수 이름 수정하기(i'=>i_ ), 변수 이름 겹침.
 
-if i'==b;
+if i_==b;
 
     %B0(b-i, i/b rho N)    
     p_bi = i/(b*rho*N);
@@ -56,7 +57,7 @@ if i'==b;
     
     P_iiNM = (pm(i) / (m(i)*N)) * bino0;
     
-elseif i'==i-1;
+elseif i_==i-1;
 
     %[sigma j=1~b(p_(b-j)(m)*B1(j,i/b rho N))+p_i(m)(1-(1/(m(i)*N)) B1(b-i,i/b rho N)]           
     for j=1:b;
@@ -81,7 +82,7 @@ elseif i'==i-1;
 end
           
             
-%drift            
+%drift
 %fN(m)=sigma i/=i' (m(i) * PiiNm * (e_i' - e_i)
 %for i=1:b;
 %end
@@ -109,7 +110,7 @@ fi(m) = (((i+1)*m(i+1)-i*m(i))/(b*rho)) * (sum(sum_fi)) - p_i(m);
 
 
 %m_i; -> m(i); the fraction of blocks containing exactly i valid pages
-%추후 수정이 필요함.
+%추후 수정이 필요함. 현재는 임의의 값.
 while sum(m)~=1;
     for i=1:b;
        m(i)=1/b; 
