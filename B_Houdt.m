@@ -16,17 +16,21 @@ for i=0:b;
     sum0(i) = MiNt(i) * e(i);   
 end
 
+
 %X_n^N(t)임시값
 for n=1:N;
     XnN(n)=randi(N);
 end
 
+
+%M_i^N(t)
 %MiNt= (1/N) * sigma n=1~N (1 [XnN(t)=i]), i=0~b;
+%X_n^N(t): the numver of valid pages on blocknumber n at time t
 for i=1:b;
     sum1(i)=0;
 
     for n=1:N;
-        if XnN(n)==i; %X_n^N(t): the numver of valid pages on blocknumber n at time t
+        if XnN(n)==i;
             sum1(i) = 1;
         end
     end
@@ -34,6 +38,8 @@ end
 MiNt(i) = (1/N) * sum(sum1);
 
 
+%equation (3)
+%P_i,i'^N(m)
 %P_iiNm= P[XnN(t+1)=i'|XnN(t)=i,MNt=m]
 %P_iiNm= (p_i(m)/(m(i)*N)) * B0(b-i, i/b rho N) 1[i'=b]
 %        +1[i'=i-1][sigma j=1~b(p_(b-j)(m)*B1(j,i/b rho N))
@@ -104,7 +110,6 @@ fi(m) = (((i+1)*m(i+1)-i*m(i))/(b*rho)) * (sum(sum_fi)) - p_i(m);
 
 %m_i; -> m(i); the fraction of blocks containing exactly i valid pages
 %추후 수정이 필요함.
-
 while sum(m)~=1;
     for i=1:b;
        m(i)=1/b; 
@@ -113,7 +118,7 @@ end
 
 
 %아래는 GC 정책에 따른 p_i(m) {pm(i)} 값 계산식
-%d-choice
+%d-choice GC
 %p_j_m=(sigma l=j~b (m_l))^d - (sigma l=j+1~b (m_l))^d;
 sum_mj_d1=0;
 sum_mj_d2=0;
@@ -125,12 +130,14 @@ for l=j+1:b;
 end
 p_j_m = sum_mj_d1^d - sum_mj_d2^d
 
-%random (p_j(m)=m_j)
+
+%random GC (p_j(m)=m_j)
 p_j_m = m(j);
 %fb(m) = (1-m_b)-( ((1-rho)/rho)*b*m_b );
 %fi(m) = ((1-rho)/rho) * ((i+1)*m_(i+1)-i*m(i)) - m(i);
 
-%random++
+
+%random++ GC
 if j <= floor(b*rho);
    set_ran_pp_pjm=1;
 else
@@ -138,6 +145,7 @@ else
 end
 
 sum_mj_rp=0;
+
 for l=0:floor(b*rho);
    sum_mj_rp=sum_mj_rp+m(l);
 end
