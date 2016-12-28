@@ -1,20 +1,15 @@
 %mean field by Benny
+%Changhyun Park
 clear;
 
-N %N of blocks
-U %N of user-visible block
-b %N of pages of each block
+%test value
+N=128; %N of blocks
+U=120;%N of user-visible block
+b=64; %N of pages of each block
 rho = U/N;
 
-A = b/(b- X);
+%A = b/(b- X);
 %X=sigma j=0~b (j*p_j);
-
-%MNt= sigma i=0~b (MiNt*ei);
-%e(i)=i-th unit vector
-for i=0:b;
-    %sum0(i)=0;
-    sum0(i) = MiNt(i) * e(i);   
-end
 
 
 %X_n^N(t)임시값
@@ -39,75 +34,16 @@ end
 MiNt(i) = (1/N) * sum(sum1);
 
 
-%equation (3)
-%P_i,i'^N(m)
-%P_iiNm= P[XnN(t+1)=i'|XnN(t)=i,MNt=m]
-%P_iiNm= (p_i(m)/(m(i)*N)) * B0(b-i, i/b rho N) 1[i'=b]
-%        +1[i'=i-1][sigma j=1~b(p_(b-j)(m)*B1(j,i/b rho N))
-%            +p_i(m)(1-(1/(m(i)*N))) B1(b-i,i/b rho N)] + o(1/N);
-%i와 i_ 변수 이름 수정하기(i'=>i_ ), 변수 이름 겹침.
-
-if i_==b;
-
-    %B0(b-i, i/b rho N)    
-    p_bi = i/(b*rho*N);
-    n_bi = b-i;
-    j_bi = 0;
-    bino0 = (factorial(n_bi)/(factorial(j_bi)) * factorial(n_bi-j_bi))) * p_bi^j_bi * (1-p_bi)^(n_bi-j_bi);
-    
-    P_iiNM = (pm(i) / (m(i)*N)) * bino0;
-    
-elseif i_==i-1;
-
-    %[sigma j=1~b(p_(b-j)(m)*B1(j,i/b rho N))+p_i(m)(1-(1/(m(i)*N)) B1(b-i,i/b rho N)]           
-    for j=1:b;
-        if j==b-i;
-            %B1(j,i/b rho N)
-            p_bi = i/(b*rho*N);
-            n_bi = j;
-            j_bi = 1;
-            bino1 = (factorial(n_bi)/(factorial(j_bi)) * factorial(n_bi-j_bi))) * p_bi^j_bi * (1-p_bi)^(n_bi-j_bi);
-
-            sum_iiN(j) = pm(b-j) * bino1;
-        end
-    end
-    
-    %B1(b-i,i/b rho N)
-    p_bi = i/(b*rho*N);
-    n_bi = b-i;
-    j_bi = 1;
-    bino2 = (factorial(n_bi)/(factorial(j_bi)) * factorial(n_bi-j_bi))) * p_bi^j_bi * (1-p_bi)^(n_bi-j_bi);
-   
-    P_iiNM = sum(sum_iiN) + pm(i)*(1-(1/(m(i)*N))) * bino2;
+%MNt= sigma i=0~b (MiNt*ei);
+%e(i)=i-th unit vector
+for i=1:b;
+    %sum0(i)=0;
+    sum0(i) = MiNt(i) * e(i);   
 end
-          
-            
-%drift
-%fN(m)=sigma i/=i' (m(i) * PiiNm * (e_i' - e_i)
-%for i=1:b;
-%end
 
-%fb(m)=(1-p_b(m))-(sigma j=1~b (p_(b-j)(m)j)*((b*m_b)/(b*rho))
 
-%sigma j=1~b (p_(b-j)(m)j
-for j=1:b;
-    %sum_fb=0;
-    %p(b-j);
-    sum_fb(j) = (p(b-j)*m*j);
-end
-fb(m) = (1-p_b(m))-(sum(sum_fb))*((b*m_b)/(b*rho));
 
-%fi(m)=(((i+1)m_(i+1)-i*m(i))/(b*rho)) * (sigma j=1~b (p_(b-j)(m)j) - p_i(m)
-
-%sigma j=1~b (p_(b-j)(m)j
-for j=1:b;
-    %sum_fi=0;
-    %p(b-j);
-    sum_fi(j) = + (p(b-j)*m*j);
-end
-%m(i); probability of blocks contain i valid pages
-fi(m) = (((i+1)*m(i+1)-i*m(i))/(b*rho)) * (sum(sum_fi)) - p_i(m);
-
+        
 
 %m_i; -> m(i); the fraction of blocks containing exactly i valid pages
 %추후 수정이 필요함. 현재는 임의의 값.
@@ -118,7 +54,7 @@ while sum(m)~=1;
 end
 
 
-%아래는 GC 정책에 따른 p_i(m) {pm(i)} 값 계산식
+%GC 정책에 따른 p_i(m) {pm(i)} 값 계산식
 %d-choice GC
 %p_j_m=(sigma l=j~b (m_l))^d - (sigma l=j+1~b (m_l))^d;
 sum_mj_d1=0;
@@ -153,6 +89,78 @@ end
 
 p_j_m = (m(j) * set_ran_pp_pjm) / sum_mj_rp;
 
+
+%drift
+%fN(m)=sigma i/=i' (m(i) * PiiNm * (e_i' - e_i)
+%for i=1:b;
+%end
+
+%fb(m)=(1-p_b(m))-(sigma j=1~b (p_(b-j)(m)j)*((b*m_b)/(b*rho))
+
+%sigma j=1~b (p_(b-j)(m)j
+for j=1:b;
+    %sum_fb=0;
+    %p(b-j);
+    sum_fb(j) = (p(b-j)*m*j);
+end
+fb(m) = (1-p_b(m))-(sum(sum_fb))*((b*m_b)/(b*rho));
+
+%fi(m)=(((i+1)m_(i+1)-i*m(i))/(b*rho)) * (sigma j=1~b (p_(b-j)(m)j) - p_i(m)
+
+%sigma j=1~b (p_(b-j)(m)j
+for j=1:b;
+    %sum_fi=0;
+    %p(b-j);
+    sum_fi(j) = + (p(b-j)*m*j);
+end
+%m(i); probability of blocks contain i valid pages
+fi(m) = (((i+1)*m(i+1)-i*m(i))/(b*rho)) * (sum(sum_fi)) - p_i(m);
+
+
+
+
+%equation (3)
+%P_i,i'^N(m)
+%P_iiNm= P[XnN(t+1)=i'|XnN(t)=i,MNt=m]
+%P_iiNm= (p_i(m)/(m(i)*N)) * B0(b-i, i/b rho N) 1[i'=b]
+%        +1[i'=i-1][sigma j=1~b(p_(b-j)(m)*B1(j,i/b rho N))
+%            +p_i(m)(1-(1/(m(i)*N))) B1(b-i,i/b rho N)] + o(1/N);
+%i'=>i_.
+
+if i_==b;
+
+    %B0(b-i, i/b rho N)    
+    p_bi = i/(b*rho*N);
+    n_bi = b-i;
+    j_bi = 0;
+    bino0 = (factorial(n_bi)/(factorial(j_bi)) * factorial(n_bi-j_bi)) * p_bi^j_bi * (1-p_bi)^(n_bi-j_bi);
+    
+    P_iiNM = (pm(i) / (m(i)*N)) * bino0;
+    
+elseif i_==i-1;
+
+    %[sigma j=1~b(p_(b-j)(m)*B1(j,i/b rho N))+p_i(m)(1-(1/(m(i)*N)) B1(b-i,i/b rho N)]           
+    for j=1:b;
+        if j==b-i;
+            %B1(j,i/b rho N)
+            p_bi = i/(b*rho*N);
+            n_bi = j;
+            j_bi = 1;
+            bino1 = (factorial(n_bi)/(factorial(j_bi)) * factorial(n_bi-j_bi)) * p_bi^j_bi * (1-p_bi)^(n_bi-j_bi);
+
+            sum_iiN(j) = pm(b-j) * bino1;
+        end
+    end
+    
+    %B1(b-i,i/b rho N)
+    p_bi = i/(b*rho*N);
+    n_bi = b-i;
+    j_bi = 1;
+    bino2 = (factorial(n_bi)/(factorial(j_bi)) * factorial(n_bi-j_bi)) * p_bi^j_bi * (1-p_bi)^(n_bi-j_bi);
+   
+    P_iiNM = sum(sum_iiN) + pm(i)*(1-(1/(m(i)*N))) * bino2;
+end
+        
 
 
 %ODE
