@@ -155,7 +155,7 @@ for i=1:b;
             p_bi = i/(b*rho*N);
             n_bi = b-i;
             j_bi = 0;
-            bino0 = (factorial(n_bi)/(factorial(j_bi)) * factorial(n_bi-j_bi)) * p_bi^j_bi * (1-p_bi)^(n_bi-j_bi);
+            bino0 = factorial(n_bi)/(factorial(j_bi) * factorial(n_bi-j_bi)) * p_bi^j_bi * (1-p_bi)^(n_bi-j_bi);
 
             P_iiNM(i,2) = (p_m(i) / (m(i)*N)) * bino0;
 
@@ -168,9 +168,9 @@ for i=1:b;
                     p_bi = i/(b*rho*N);
                     n_bi = j;
                     j_bi = 1;
-                    bino1 = (factorial(n_bi)/(factorial(j_bi)) * factorial(n_bi-j_bi)) * p_bi^j_bi * (1-p_bi)^(n_bi-j_bi);
+                    bino1(j) = factorial(n_bi)/(factorial(j_bi) * factorial(n_bi-j_bi)) * p_bi^j_bi * (1-p_bi)^(n_bi-j_bi);
 
-                    sum_iiN(j) = p_m(b-j) * bino1;
+                    sum_iiN(j) = p_m(b-j) * bino1(j);
                 end
             end
 
@@ -178,9 +178,9 @@ for i=1:b;
             p_bi = i/(b*rho*N);
             n_bi = b-i;
             j_bi = 1;
-            bino2 = (factorial(n_bi)/(factorial(j_bi)) * factorial(n_bi-j_bi)) * p_bi^j_bi * (1-p_bi)^(n_bi-j_bi);
+            bino2(i_) = factorial(n_bi)/(factorial(j_bi) * factorial(n_bi-j_bi)) * p_bi^j_bi * (1-p_bi)^(n_bi-j_bi);
 
-            P_iiNM(i,1) = sum(sum_iiN) + p_m(i)*(1-(1/(m(i)*N))) * bino2;
+            P_iiNM(i,1) = sum(sum_iiN) + p_m(i)*(1-(1/(m(i)*N))) * bino2(i_);
         end
 
     end
