@@ -13,7 +13,7 @@ rho = U/N;
 %d-choice=0
 %random=1
 %random++=2
-gcp=0;
+gcp=2;
 
 %A = b/(b- X);
 %X=sigma j=0~b (j*p_j);
@@ -54,12 +54,12 @@ end
 
 %m_i; -> m(i); the fraction of blocks containing exactly i valid pages
     %추후 수정이 필요함. 현재는 임의의 값.
-for i=1:b;
-    m(i)=1/b;
+for i=0:b;
+    m(i+1)=1/(b+1);
 end
-while sum(m)~=1;
-    for i=1:b;
-       m(i)=1/b; 
+while sum(m)==1;
+    for i=0:b;
+       m(i+1)=1/(b+1); 
     end
 end
 
@@ -68,29 +68,29 @@ end
 %d-choice GC
 %p_j_m=(sigma l=j~b (m_l))^d - (sigma l=j+1~b (m_l))^d;
 if gcp==0;
-    for j=1:b;
+    for j=0:b;
         sum_mj_d1=0;
         sum_mj_d2=0;
         for l=j:b;
-            sum_mj_d1=sum_mj_d1+m(l);
+            sum_mj_d1=sum_mj_d1+m(l+1);
         end
         for l=j+1:b;
-            sum_mj_d2=sum_mj_d2+m(l);
+            sum_mj_d2=sum_mj_d2+m(l+1);
         end
-        p_m(j) = sum_mj_d1^d - sum_mj_d2^d;
+        p_m(j+1) = sum_mj_d1^d - sum_mj_d2^d;
     end
 
 elseif gcp==1;   
 %random GC (p_j(m)=m_j)
-    for j=1:b;
-        p_m(j) = m(j);
+    for j=0:b;
+        p_m(j+1) = m(j+1);
         %fb(m) = (1-m_b)-( ((1-rho)/rho)*b*m_b );
         %fi(m) = ((1-rho)/rho) * ((i+1)*m_(i+1)-i*m(i)) - m(i);
     end
 
 elseif gcp==2;
 %random++ GC
-    for j=1:b;
+    for j=0:b;
 
         if j <= floor(b*rho);
            set_ran_pp_pjm=1;
@@ -101,10 +101,10 @@ elseif gcp==2;
         sum_mj_rp=0;
 
         for l=1:floor(b*rho);
-           sum_mj_rp=sum_mj_rp+m(l);
+           sum_mj_rp=sum_mj_rp+m(l+1);
         end
 
-        p_m(j) = (m(j) * set_ran_pp_pjm) / sum_mj_rp;
+        p_m(j+1) = (m(j+1) * set_ran_pp_pjm) / sum_mj_rp;
     end
 end
 
@@ -128,14 +128,14 @@ f_m(b) = (1-p_m(b))-(sum(sum_fb))*((b*m(b))/(b*rho));
 
 
 %sigma j=1~b (p_(b-j)(m)j
-for i=1:b-1;
+for i=0:b-1;
     for j=1:b;
         %sum_fi=0;
         %p(b-j);
         sum_fi(j) = + (p_m(b-j+1)*j);
     end
     %m(i); probability of blocks contain i valid pages
-    f_m(i) = (((i+1)*m(i+1)-i*m(i))/(b*rho)) * (sum(sum_fi)) - p_m(i);
+    f_m(i+1) = (((i+1)*m(i+1+1)-i*m(i+1))/(b*rho)) * (sum(sum_fi)) - p_m(i+1);
 end
 
 
@@ -147,9 +147,11 @@ end
 %        +1[i'=i-1][sigma j=1~b(p_(b-j)(m)*B1(j,i/b rho N))
 %            +p_i(m)(1-(1/(m(i)*N))) B1(b-i,i/b rho N)] + o(1/N);
 %i'=>i_.
-for i=1:b; 
-    for i_=1:b;
-        if i_==b;
+
+for i=0:b; 
+    %for i_=0:b;
+        %if i_==b;
+        i_=b;
 
             %B0(b-i, i/b rho N)    
             p_bi = i/(b*rho*N);
@@ -157,20 +159,23 @@ for i=1:b;
             j_bi = 0;
             bino0 = factorial(n_bi)/(factorial(j_bi) * factorial(n_bi-j_bi)) * p_bi^j_bi * (1-p_bi)^(n_bi-j_bi);
 
-            P_iiNM(i,2) = (p_m(i) / (m(i)*N)) * bino0;
+            P_iiNM(i+1,2) = (p_m(i+1) / (m(i+1)*N)) * bino0;
 
-        elseif i_==i-1;
-
+        
+        %elseif i_== i-1;
+    if i~=0;
+        i_=i-1;
+            clear sum_iiN;
             %[sigma j=1~b(p_(b-j)(m)*B1(j,i/b rho N))+p_i(m)(1-(1/(m(i)*N)) B1(b-i,i/b rho N)]           
             for j=1:b;
-                if j==b-i;
+                if j~=b-i;
                     %B1(j,i/b rho N)
                     p_bi = i/(b*rho*N);
                     n_bi = j;
                     j_bi = 1;
                     bino1(j) = factorial(n_bi)/(factorial(j_bi) * factorial(n_bi-j_bi)) * p_bi^j_bi * (1-p_bi)^(n_bi-j_bi);
 
-                    sum_iiN(j) = p_m(b-j) * bino1(j);
+                    sum_iiN(j) = p_m(b-j+1) * bino1(j);
                 end
             end
 
@@ -178,12 +183,17 @@ for i=1:b;
             p_bi = i/(b*rho*N);
             n_bi = b-i;
             j_bi = 1;
-            bino2(i_) = factorial(n_bi)/(factorial(j_bi) * factorial(n_bi-j_bi)) * p_bi^j_bi * (1-p_bi)^(n_bi-j_bi);
-
-            P_iiNM(i,1) = sum(sum_iiN) + p_m(i)*(1-(1/(m(i)*N))) * bino2(i_);
-        end
-
+            
+            if n_bi-j_bi >= 0;
+                bino2(i_+1) = factorial(n_bi)/(factorial(j_bi) * factorial(n_bi-j_bi)) * p_bi^j_bi * (1-p_bi)^(n_bi-j_bi);
+            else
+                bino2(i_+1) = factorial(n_bi)/(factorial(j_bi) * factorial(0)) * p_bi^j_bi * (1-p_bi)^(n_bi-j_bi);
+            end
+                
+            P_iiNM(i+1,1) = sum(sum_iiN) + p_m(i+1)*(1-(1/(m(i+1)*N))) * bino2(i_+1);
     end
+        %end
+    %end
  end
     
     
