@@ -4,8 +4,11 @@ kpks = zeros(1,SizeofCal);
 fac(1)=1;
 fac(2)=1;
 for fa=3:1:Np+1;
-    fac(fa) = fac(fa-1) * (fa-1);
+    %fac(fa) = fac(fa-1) * (fa-1);
+    fac(fa) = sqrt(2*pi*(fa-1)) * ((fa-1)/exp(1))^(fa-1);
 end
+
+
 
 for k=1:1:Np-1;
     %pajvjk1=1;%ones(1,10001);

@@ -13,7 +13,7 @@ rho = U/N;
 %d-choice=0
 %random=1
 %random++=2
-gcp=2;
+gcp=1;
 
 %A = b/(b- X);
 %X=sigma j=0~b (j*p_j);
@@ -28,7 +28,7 @@ end
 
 %M_i^N(t)
 %MiNt= (1/N) * sigma n=1~N (1 [XnN(t)=i]), i=0~b;
-%X_n^N(t): the numver of valid pages on blocknumber n at time t
+%X_n^N(t): the number of valid pages on blocknumber n at time t
 for i=1:b;
     sum1(i)=0;
 
@@ -198,11 +198,22 @@ for i=0:b;
     
     
 %ODE
-%d-choice
+if gcp==0;
+    %d-choice
+    %A=1/(1-rho^d) :  lower bound
+    %A= b/ (b - lower(b*rho) - (b*rho - lower(b*rho) )^d) : upper bound
+    
+    A=1/(1-rho^d);
+    
+elseif gcp==1;
+    %random
+    %A=b/(b-sigma i=0~b i mu i) = 1/1-rho
 
-%random
-%A=b/(b-sigma i=0~b i mu i) = 1/1-rho
+    A=1/(1-rho);
 
+elseif gcp==2;
+    %random++
+    %A=1 / (1- ( (rho- mu_b(b-lower(b*rho)) / ( 1-mu_b*b*S_rho,b) )  )
 
-%random++
-
+    
+end
